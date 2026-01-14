@@ -1,0 +1,40 @@
+{
+  "name": "xeroa-cyberdefense",
+  "version": "1.1.0",
+  "description": "Enterprise-Grade 4-Layer Security System for Node.js - DDoS Protection, Rate Limiting, Brute Force Prevention",
+  "main": "index.js",
+  "author": "Shakir ullah (@sk-labs)",
+  "license": "MIT",
+  "keywords": [
+    "security",
+    "rate-limiting",
+    "ddos-protection",
+    "brute-force-prevention",
+    "express-middleware",
+    "authentication-security",
+    "cybersecurity",
+    "4-layer-defense"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sk-labs/xeroa-cyberdefense.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sk-labs/xeroa-cyberdefense/issues"
+  },
+  "homepage": "https://github.com/sk-labs/xeroa-cyberdefense#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {
+    "express-rate-limit": "^7.1.5",
+    "mongoose": "^8.0.0"
+  },
+  "peerDependencies": {
+    "express": "^4.18.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node tests/test-security.js"
+  }
+}
