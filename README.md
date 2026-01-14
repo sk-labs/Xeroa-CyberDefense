@@ -51,22 +51,31 @@ Protect your Node.js applications from DDoS attacks, brute force attempts, and m
 
 ## 📦 Installation
 
-### From NPM (When Published)
+### Clone from GitHub
 
 ```bash
-npm install xeroa-cyberdefense
-```
+# Navigate to your project root
+cd /path/to/your/project
 
-### From Local Package
-
-```bash
-# Copy the Xeroa-CyberDefense folder to your project
-cp -r Xeroa-CyberDefense /path/to/your/project/
+# Clone Xeroa CyberDefense
+git clone https://github.com/sk-labs/Xeroa-CyberDefense.git
 
 # Install dependencies
-cd /path/to/your/project/Xeroa-CyberDefense
+cd Xeroa-CyberDefense
 npm install
+cd ..
 ```
+
+### Or Download ZIP
+
+1. Download from: https://github.com/sk-labs/Xeroa-CyberDefense
+2. Extract to your project root
+3. Install dependencies:
+
+```bash
+cd Xeroa-CyberDefense
+npm install
+cd ..
 
 ---
 
@@ -76,7 +85,7 @@ npm install
 
 ```javascript
 const express = require('express');
-const xeroa = require('./Xeroa-CyberDefense');
+const xeroa = require('./Xeroa-CyberDefense'); // Local folder
 
 const app = express();
 
@@ -400,6 +409,53 @@ node tests/reset-blocks.js
 - Blocks attacks before memory exhaustion
 - Saves ~$175/month vs unprotected system
 - Maintains 99.9% uptime under attack
+
+---
+
+## 🔒 Security Best Practices
+
+### Preventing Email Enumeration Attacks
+
+**Critical:** Always use IP-based warnings, not email-based!
+
+```javascript
+// ❌ BAD: Email-based warnings reveal which emails exist
+const emailResult = await xeroa.recordFailure(email, 'email');
+if (emailResult.remainingAttempts <= 2) {
+  // Attacker learns: This email EXISTS!
+}
+
+// ✅ GOOD: IP-based warnings prevent enumeration
+const ipResult = await xeroa.recordFailure(clientIP, 'ip');
+if (ipResult.remainingAttempts <= 2) {
+  // All emails show same warning - attacker learns nothing!
+}
+```
+
+**How it works:**
+
+```
+Try admin@smja.com (wrong) → IP counter: 1/3 → "2 attempts remaining"
+Try fake@smja.com (wrong) → IP counter: 2/3 → "1 attempt remaining"  
+Try random@smja.com (wrong) → IP counter: 3/3 → BLOCKED!
+
+Result: Only 3 total login attempts regardless of emails tried! ✅
+```
+
+### Progressive Blocking Thresholds
+
+| Attempts | IP Status | Email Status | Block Duration |
+|----------|-----------|--------------|----------------|
+| 1-2      | ⚠️ Warning | ⚠️ Warning   | None           |
+| 3        | 🔒 Blocked | 🔒 Blocked   | 15 minutes     |
+| 4-5      | 🔒 Blocked | 🔒 Blocked   | 1 hour         |
+| 6-8      | 🔒 Blocked | 🔒 Blocked   | 24 hours       |
+
+**Why IP and Email limits are both 3/5/8?**
+
+- **IP Blocking:** Primary defense - stops unlimited email attempts
+- **Email Blocking:** Secondary defense - protects specific accounts
+- **Combined:** Unbreakable protection against brute force and enumeration
 
 ---
 

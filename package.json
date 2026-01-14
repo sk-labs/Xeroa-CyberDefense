@@ -1,7 +1,7 @@
 {
   "name": "xeroa-cyberdefense",
-  "version": "1.1.0",
-  "description": "Enterprise-Grade 4-Layer Security System for Node.js - DDoS Protection, Rate Limiting, Brute Force Prevention",
+  "version": "1.2.0",
+  "description": "Enterprise-Grade 4-Layer Security System for Node.js - DDoS Protection, Rate Limiting, Brute Force Prevention, Email Enumeration Protection",
   "main": "index.js",
   "author": "Shakir ullah (@sk-labs)",
   "license": "MIT",

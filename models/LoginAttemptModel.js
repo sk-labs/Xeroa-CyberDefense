@@ -98,9 +98,11 @@ LoginAttemptSchema.statics.recordFailure = async function(identifier, type) {
     }
     
     // Progressive blocking based on type
+    // SECURITY: Both IP and email use same strict limits (3/5/8)
+    // This prevents email enumeration attacks (can't try unlimited emails)
     const limits = type === 'ip' 
-        ? { first: 10, second: 20, third: 30 }  // More lenient for IPs (shared networks)
-        : { first: 3, second: 5, third: 8 };     // Stricter for email accounts
+        ? { first: 3, second: 5, third: 8 }      // Strict: Only 3 wrong attempts total
+        : { first: 3, second: 5, third: 8 };     // Same for email accounts
     
     // Progressive penalties: 15 min → 1 hour → 24 hours
     if (attempt.consecutiveFailures >= limits.third) {

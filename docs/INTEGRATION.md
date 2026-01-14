@@ -160,10 +160,23 @@ app.post('/auth/login', loginLimiter, async (req, res) => {
   
   // STEP 3: Verify credentials
   const user = await User.findOne({ email });
+  
+  // IMPORTANT: Always record IP failures to prevent email enumeration
+  // Show IP-based warnings, not email-based (prevents unlimited attempts)
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    // Record failure for both IP and email
-    await helpers.recordFailure(email, 'email');
-    await helpers.recordFailure(clientIP, 'ip');
+    // Primary defense: Track IP failures (3 attempts total)
+    const ipResult = await helpers.recordFailure(clientIP, 'ip');
+    
+    // Secondary: Track email failures (locks specific account if it exists)
+    if (email) {
+      await helpers.recordFailure(email, 'email');
+    }
+    
+    // Show IP-based warning (not email-based)
+    if (ipResult.remainingAttempts > 0 && ipResult.remainingAttempts <= 2) {
+      req.flash('error', `⚠️ Invalid credentials. Warning: ${ipResult.remainingAttempts} attempt(s) remaining before temporary lockout.`);
+      return res.redirect('/login');
+    }
     
     req.flash('error', 'Invalid email or password');
     return res.redirect('/login');
