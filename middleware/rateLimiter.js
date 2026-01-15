@@ -36,28 +36,9 @@ const globalLimiter = rateLimit({
     // 1. Authenticated users (logged in staff) - They need unlimited requests for work
     // 2. Static assets (CSS, JS, images, fonts)
     skip: (req) => {
-        // Skip for authenticated users
-        // Check multiple session types for compatibility
-        const hasSession = !!(req.session);
-        const hasSessionData = hasSession && !!(req.session.userid || req.session.userId || req.session.user);
-        const userId = hasSessionData && (req.session.userid || req.session.userId || req.session.user);
-        const willSkip = hasSessionData;
-        
-        // Debug logging for troubleshooting
-        if (process.env.DEBUG_RATE_LIMIT === 'true') {
-            console.log('🔍 Xeroa Rate Limit Debug:', {
-                path: req.path,
-                hasSession,
-                hasSessionData,
-                userId,
-                sessionId: req.sessionID || 'none',
-                cookies: req.get('cookie')?.substring(0, 50),
-                willSkip
-            });
-        }
-        
-        if (willSkip) {
-            return true; // Authenticated users bypass global limiter
+        // Skip for authenticated users - Check multiple session field patterns
+        if (req.session && (req.session.userid || req.session.userId || req.session.user)) {
+            return true; // Authenticated users bypass global limiter completely
         }
         
         // Skip for static assets (CSS, JS, images, fonts, etc.)
