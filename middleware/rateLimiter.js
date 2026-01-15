@@ -38,7 +38,25 @@ const globalLimiter = rateLimit({
     skip: (req) => {
         // Skip for authenticated users
         // Check multiple session types for compatibility
-        if (req.session && (req.session.userid || req.session.userId || req.session.user)) {
+        const hasSession = !!(req.session);
+        const hasSessionData = hasSession && !!(req.session.userid || req.session.userId || req.session.user);
+        const userId = hasSessionData && (req.session.userid || req.session.userId || req.session.user);
+        const willSkip = hasSessionData;
+        
+        // Debug logging for troubleshooting
+        if (process.env.DEBUG_RATE_LIMIT === 'true') {
+            console.log('🔍 Xeroa Rate Limit Debug:', {
+                path: req.path,
+                hasSession,
+                hasSessionData,
+                userId,
+                sessionId: req.sessionID || 'none',
+                cookies: req.get('cookie')?.substring(0, 50),
+                willSkip
+            });
+        }
+        
+        if (willSkip) {
             return true; // Authenticated users bypass global limiter
         }
         
